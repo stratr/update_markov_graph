@@ -39,6 +39,13 @@ def create_markov_graph():
         start_words[current_word] = start_weight
 
 
+def store_pickle(bucket, folder, file_name, dict_data):
+    file_path = '{}/{}.pickle'.format(folder, file_name)
+    print('Storing file to: {}'.format(file_path))
+    blob = bucket.blob(file_path)
+    blob.upload_from_string(pickle.dumps(dict_data))
+
+
 create_markov_graph()
 
 storage_client = storage.Client()
@@ -46,12 +53,10 @@ bucket = storage_client.bucket('markov_generator')
 folder = 'all_meps'
 
 # Save the markov graph
-markov_blob = bucket.blob('all_meps/markov_graph.pickle')
-markov_blob.upload_from_string(pickle.dumps(markov_graph))
+store_pickle(bucket, folder, 'markov_graph', markov_graph)
 
 # Save the start words
-start_blob = bucket.blob('all_meps/start_words.pickle')
-start_blob.upload_from_string(pickle.dumps(start_words))
+store_pickle(bucket, folder, 'start_words', start_words)
 
 
 # pickle_in = blob.download_as_string()
