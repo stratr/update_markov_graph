@@ -3,8 +3,6 @@ from google.cloud import storage
 from google.cloud import bigquery
 from collections import defaultdict
 
-storage_client = storage.Client()
-
 # Markov graph
 markov_graph = {}
 
@@ -14,7 +12,7 @@ start_words = {}
 # build the ditionary and get start word weights
 def create_markov_graph():
     # The source data is already prepared in BigQuery. Read it into dictionary format.
-    query_sql = "SELECT * FROM `tanelis.markov_chain.markov_graph`"
+    query_sql = "SELECT * FROM `tanelis.markov_chain.markov_graph_view`"
 
     client = bigquery.Client()
     query_job = client.query(query_sql)
@@ -43,17 +41,17 @@ def create_markov_graph():
 
 create_markov_graph()
 
-bucket = storage_client.bucket('markov_generator/all_meps')
+storage_client = storage.Client()
+bucket = storage_client.bucket('markov_generator')
+folder = 'all_meps'
 
 # Save the markov graph
-markov_blob = bucket.blob('markov_graph.pickle')
-markov_pickle = pickle.dumps(markov_graph)
-markov_blob.upload_from_string(markov_pickle)
+markov_blob = bucket.blob('all_meps/markov_graph.pickle')
+markov_blob.upload_from_string(pickle.dumps(markov_graph))
 
 # Save the start words
-start_blob = bucket.blob('start_words.pickle')
-start_pickle = pickle.dumps(start_words)
-start_blob.upload_from_string(start_pickle)
+start_blob = bucket.blob('all_meps/start_words.pickle')
+start_blob.upload_from_string(pickle.dumps(start_words))
 
 
 # pickle_in = blob.download_as_string()
