@@ -20,7 +20,7 @@ def create_markov_graph():
 
     for row in results:
         current_word = row["current_word"]
-        start_weight = row["start_probability"]
+        start_count = row["first_word_count"]
         next_array = row["next"]
 
         markov_graph[current_word] = {}
@@ -36,7 +36,7 @@ def create_markov_graph():
                 next_word_weight, next_word_stop, next_word_end_probability]
 
         # Get the start word weights for when the tweet is generated with a random start word
-        start_words[current_word] = start_weight
+        start_words[current_word] = start_count
 
 
 def store_pickle(bucket, folder, file_name, dict_data):
@@ -57,9 +57,3 @@ store_pickle(bucket, folder, 'markov_graph', markov_graph)
 
 # Save the start words
 store_pickle(bucket, folder, 'start_words', start_words)
-
-
-# pickle_in = blob.download_as_string()
-# my_dictionary = pickle.loads(pickle_in)
-# print(my_dictionary)
-# print(type(my_dictionary))
